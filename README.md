@@ -1,5 +1,5 @@
 
-== Annot 0.9.1 ==
+# ANNOT 1.0.0
 
 This is the source code for Annot, a tool to lookup annotations for
 Objective Caml source code. The main purpose is to lookup the type
@@ -18,27 +18,23 @@ a shell.  For full documentation, please refer to the manual page
 annot.pod.
 
 OCaml 3.09 introduced the -dtypes compiler flag that causes the compiler
-to write annotation files. Hence, invoking compiler runs with -dtypes
-keeps the annotation files up to date. Currently the compiler only
-generates type annotations; however, in principle other annotations
-could be looked up as well.
+`ocamlc` to write annotation files while compiling a source file. In recent
+versions of the compiler the flag was re-named to `-annot`.  Hence,
+invoking compiler runs with `-annot` keeps the annotation files up to date.
+Currently the compiler only generates type annotations; however, in
+principle other annotations could be looked up as well.
 
-INSTALLATION
+## INSTALLATION
 
 Annot is implemented in Objective Caml. To compile it from source code,
 try the following:
 
-    ./configure --prefix=/usr/local
     make
     make install
 
-The configure script tries to locate all necessary tools and generates a
-file config.mk that is included by the main Makefile. If something goes
-wrong, try running "./configure -v".
+The latest tested version is OCaml 4.00.
 
-The latest tested version is OCaml 3.11.0 and 3.11.1.
-
-USING ANNOT FROM AN EDITOR
+## USING ANNOT FROM AN EDITOR
 
 To use Annot from Vim, include the following code into your ~/.vimrc
 file (also provided in editors/):
@@ -49,38 +45,30 @@ file (also provided in editors/):
         let file = expand("%:p:r")
         echo system("annot -n -type ".line." ".col." ".file.".annot")
     endfunction    
-    map ,t :call OCamlType()<return>
+    map <leader>t :call OCamlType()<return>
 
-The key combination ",t" (without quotes) looks up the type annotation
-for the identifier under the cursor.
+The key combination ",t" (without quotes and assuming the leader key is
+comma) looks up the type annotation for the identifier under the cursor.
 
 Instructions for other editors can be found in the editors/ directory.
 
-SOURCE CODE
+## SOURCE CODE
 
 The source code is a literate program for the NoWeb literate programming
 tools and resides in the *.nw file in directory src/. However, you don't
-need NoWeb to compile and install the Annot.  The configure detects when
-NoWeb is installed otherwise uses Perl script tools/nofake to extract
-the Objective Caml code code from the *.nw files.
+need NoWeb to compile and install the Annot.  
 
-If you have the NoWeb tool chain installs you can use make to produce
-PDF files from *.nw files by executing "make main.pdf", for example.
-Note that the Nofake tool that comes as part of the Annot source code is
-not enough to build the PDF documentation. For this you need the real
-NoWeb tools. These are available on Debian as package "nowebm".
-
-COPYRIGHT
+## COPYRIGHT
 
 Please see the manual page annot.pod for the exact copyright. 
 
-AUTHOR AND CONTACT
+## AUTHORS AND CONTACT
 
 Anil Madhavapeddy
 anil@recoil.org
 http://anil.recoil.org
 
 Christian Lindig (original author)
-lindig@cs.uni-sb.de
-http://www.cs.uni-sb.de/~lindig/
+lindig@gmail.com
+
 

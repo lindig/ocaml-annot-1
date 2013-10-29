@@ -1,18 +1,22 @@
 #
-# This is the top-level Makefile. Nothing interesting happens here; for
-# every target we change to src/ first and build it there.
+# 
 #
 
-all: 	config.mk
+PREFIX =    $(HOME)
+BINDIR =    $(HOME)/bin
+MAN1DIR =   $(HOME)/man/man1
+
+all:	lipsum
 	$(MAKE) -C src $@
 
-clobber: config.mk
-	$(MAKE) -C src $@
-	rm -f config.mk
-
-%: 	config.mk
+clean:
 	$(MAKE) -C src $@
 
+install: all
 
-config.mk:
-	@echo "Have you run ./configure? ./config.mk is missing"
+
+lipsum: FORCE
+	$(MAKE) -C lipsum all
+
+FORCE:
+

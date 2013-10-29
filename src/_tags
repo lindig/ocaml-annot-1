@@ -1,0 +1,3 @@
+
+<*.native>: linkdep(custom_unix_stubs.o)
+
