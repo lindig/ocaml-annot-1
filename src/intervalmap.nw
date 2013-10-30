@@ -2,11 +2,11 @@
 \section{Interval Map}
 
 An interval map associates intervals with data. An interval $[l,h] = \{
-p \mid l \le p \le h \}$ is delimited by two \emph{points} $l$ and high
-$h$ and is associated with a datum. A lookup operation finds the
-smallest interval enclosing a point $p$ and returns the datum associated
-with that interval. Intervals may nest: two intervals must be either
-disjoint or one must contain the other.
+p \mid l \le p \le h \}$ is delimited by two \emph{points} $l$ (low) and 
+$h$ (high) and is associated with a datum. A lookup operation finds the
+smallest interval enclosing a given point $p$ and returns the datum
+associated with that interval. Intervals may nest: two intervals must be
+either disjoint or one must contain the other.
 
 Interval maps are parameterized over points: a point is a comparable
 type, and an interval is delimited by two points.
@@ -41,7 +41,7 @@ end
 <<intervalmap.mli>>=
 <<signatures>>
 module Make (P: POINT): S 
-    with type point = P.t
+    with type point    = P.t
     and  type interval = P.t * P.t
 @
 
@@ -61,7 +61,7 @@ end
 
 
 <<Make>>=
-type point = P.t
+type point    = P.t
 type interval = P.t * P.t
 
 type 'a t  = (interval * 'a) list
