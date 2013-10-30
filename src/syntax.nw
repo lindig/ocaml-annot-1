@@ -20,31 +20,35 @@
 
 <<types>>=
 %start annotations
-%type <Annot.t> annotations
+%type <Annot.annot> annotations
 
 %token EOF 
 %token <string> STRING
 %token <int>    INT
-%token <string> ANNOT IDENT CALL
+%token <string> TYPE IDENT CALL
 @
 
 <<grammar>>=
-annotations     : annotations annot             { let interval, annots = $2 in
-                                                  List.fold_right (A.add interval) annots $1
-                                                }
+annotations     : annotations annot     
+
+                { let interval, annots = $2 in
+                    List.fold_right (A.add interval) annots $1
+                }
+
                 | /**/                          { A.empty   }
                 
-annot           : location location data        { ($1,$2), $3 }
+annot           : interval data                 { $1, $2 }
 
-data            : ANNOT data                    { $1 :: $2 }
-                | ANNOT                         { [$1] }
+data            : TYPE data                     { $1 :: $2 }
+                | TYPE                          { [$1] }
                 | IDENT data                    { $2 }
                 | IDENT                         { [] }
                 | CALL data                     { $2 }
                 | CALL                          { [] }
-;
+                ;
 
-location        : STRING INT INT INT            { $2, $4-$3   }
+interval        : location location             { $1, $2 }
+location        : STRING INT INT INT            { $2, $4-$3 }
 
 @
 
@@ -63,21 +67,23 @@ val token:          Lexing.lexbuf -> Parser.token
 
     module P = Parser   (* tokens are defined here *)
 
+    exception Error of string
+    let error fmt   = Printf.kprintf (fun msg -> raise (Error msg)) fmt
+    let (@@) f x    = f x
+
+    type  mode      = Type | Ident | Call
+
     let get         = Lexing.lexeme
     let getchar     = Lexing.lexeme_char
     let strlen      = String.length
     let pos_start   = Lexing.lexeme_start
     let pos_end     = Lexing.lexeme_end
-    
-    exception Error of string
-    let error fmt   = Printf.kprintf (fun msg -> raise (Error msg)) fmt
-    let (@@) f x    = f x
-
 }
 @
 
 <<scanner.mll>>=
 let digit           = ['0'-'9']
+let id              = ['a'-'z']+
 let ws              = [' ' '\t' '\r']
 let nl              = '\n'
 @
@@ -90,9 +96,9 @@ rule token = parse
 
   | digit+          { P.INT(int_of_string (get lexbuf)) }
   | '"' ([^'"']+ as str) '"'{ P.STRING (str)}
-  | "type(\n"       { annot `Type (Buffer.create 80) lexbuf } 
-  | "ident(\n"      { annot `Ident (Buffer.create 80) lexbuf } 
-  | "call(\n"       { annot `Call (Buffer.create 80) lexbuf } 
+  | "type("   nl    { annot Type    (Buffer.create 80) lexbuf } 
+  | "ident("  nl    { annot Ident   (Buffer.create 80) lexbuf } 
+  | "call("   nl    { annot Call    (Buffer.create 80) lexbuf } 
   | _               { let str    = String.escaped @@ get lexbuf in
                       let off    = Lexing.lexeme_start lexbuf in
                         error "illegal character: '%s' at offset %d" str off
@@ -107,9 +113,9 @@ and annot mode buffer = parse
                     ; annot mode buffer lexbuf 
                     } 
   | nl ')'          { match mode with
-                      |`Type -> P.ANNOT(Buffer.contents buffer)
-                      |`Ident -> P.IDENT(Buffer.contents buffer)
-                      |`Call -> P.CALL(Buffer.contents buffer)
+                    | Type  -> P.TYPE(Buffer.contents buffer)
+                    | Ident -> P.IDENT(Buffer.contents buffer)
+                    | Call  -> P.CALL(Buffer.contents buffer)
                     }
   | _               { let str    = String.escaped @@ get lexbuf in
                       let off    = Lexing.lexeme_start lexbuf in

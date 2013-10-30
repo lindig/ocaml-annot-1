@@ -24,7 +24,17 @@ module ByPosition: Intervalmap.S
     with type point = Position.t
     and  type interval = Position.t * Position.t
 
-type t = string ByPosition.t
+type annot = string ByPosition.t
+
+@ The OCaml compiler currently provides three kinds of annotations: for
+types, calls, and definitions. We maintain three kinds of maps for these.
+
+<<annot.mli>>=
+type t = 
+    { types:    annot
+    ; calls:    annot
+    ; idents:   annot
+    }
 @
 
 % ------------------------------------------------------------------ 
@@ -49,5 +59,11 @@ end
 
 module ByPosition = Intervalmap.Make(Position)
 
-type t = string ByPosition.t
+type annot = string ByPosition.t
+
+type t = 
+    { types:    annot
+    ; calls:    annot
+    ; idents:   annot
+    }
 @

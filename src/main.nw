@@ -15,9 +15,12 @@ val main: unit -> unit (* executed automatically *)
 \subsection{Implementation}
 
 <<main.ml>>=
+exception Error of string
 exception Usage of string
 
-let error   fmt = Printf.kprintf (fun msg -> raise (Usage msg)) fmt
+let error   fmt = Printf.kprintf (fun msg -> raise (Error msg)) fmt
+let usage   fmt = Printf.kprintf (fun msg -> raise (Usage msg)) fmt
+ 
 let printf      = Printf.printf
 let sprintf     = Printf.sprintf
 let version     = "1.0.0"
@@ -28,38 +31,29 @@ let this        = Sys.argv.(0)
 let synopsis =
     [ "usage: "^this^" [options] [file.annot]" 
     ; ""
-    ; "-type line column                lookup type annotation for position"
-    ; "-dump                            dump annotations to stdout"
-    ; "-n                               suppress newline after last line"
-    ; "-r                               include range for annotation"
-    ; "-version                         identify version of "^this^" on stdout"
-    ; "-h, -help                        offer minimal help on stdout"
+    ; "-type line column            lookup type annotation for position"
+    ; "-dump                        dump annotations to stdout"
+    ; "-n                           suppress newline after last line"
+    ; "-r                           include range for annotation"
+    ; "-h, -help                    offer minimal help on stdout"
     ; ""
-    ; "Maintainer: Anil Madhavapedddy http://anil.recoil.org/"
-    ; "Author: Christian Lindig http://www.st.cs.uni-sb.de/~lindig/"
+    ; "Version "^version
+    ; "Maintainer:      Anil Madhavapedddy http://anil.recoil.org/"
+    ; "Author:          Christian Lindig <lindig@gmail.com>"
+    ; "Source code available from https://github.com/avsm/ocaml-annot.git"
     ]
     
-let usage msg = List.iter prerr_endline (msg :: synopsis)
-let help ()   = List.iter print_endline synopsis
-
-let version () =
-    List.iter print_endline
-    [ this^" version " ^ version ]
+let help ()    = List.iter print_endline synopsis
 @
 
 <<main.ml>>=
 module A = Annot.ByPosition
 @
 
-Operation [[with_file]] opens a file for reading and passes the file
-handle to an action. It takes care of closing the file, even in the case
-of errors.
-
 <<main.ml>>=
-
 external realpath: string -> string = "unix_realpath"
 
-let find_file file =
+let find file =
   let cwd = realpath (Sys.getcwd ()) in
   let filedir = realpath (Filename.dirname file) in
   let filename = Filename.basename file in
@@ -78,13 +72,16 @@ let find_file file =
     ) (List.rev backends);
     (match !result with
     | Some r -> r
-    | None   -> raise Not_found)
-  |_ -> raise Not_found
+    | None   -> error "Can't find %s" file
+    )
+  |_ -> error "Can't find file %s" file
 
+@ Operation [[with_file]] opens a file for reading and passes the file
+handle to an action. It takes care of closing the file, even in the case
+of errors.
+
+<<main.ml>>=
 let with_file file action =
-    let file =
-      try find_file file
-      with Not_found -> print_string ("Cannot find " ^ file); exit 1 in
     let ic = open_in file in
     try 
         let result = action ic in
@@ -146,22 +143,25 @@ let main () =
     let rec parse = function
         | "-h"               :: [] -> help ()
         | "-help"            :: [] -> help ()
-        | "-version"         :: [] -> version ()
         | "-n"               :: args -> options.newline <- false; parse args
         | "-r"               :: args -> options.range   <- true;  parse args
-        | ["-type"; line;col;file] -> with_file file 
+        | ["-type"; line;col;file] -> with_file (find file) 
                                         @@ typeannot options line col 
         | ["-type"; line;col]      -> typeannot options line col stdin
         | ["-dump"; file]          -> with_file file @@ dump
         | ["-dump"]                -> dump stdin
-        | x :: _ -> usage @@ sprintf "error: illegal command line argument %s" x
+        | x :: _ -> usage "error: illegal command line argument %s" x
         | []     -> usage "error: expected an option"
     in              
-        try parse args with 
-        |   Usage     msg -> (usage msg; exit 1)
-        |   Sys_error msg -> (print_endline msg; exit 1)
+        parse args
 
-let () = if !Sys.interactive then () else main ()
+let () = 
+    if !Sys.interactive then 
+        () 
+    else try main (); exit 0 with
+        |   Usage     msg -> prerr_endline msg; exit 1
+        |   Error     msg -> prerr_endline msg; exit 1
+        |   Sys_error msg -> prerr_endline msg; exit 1
 @
 
 
