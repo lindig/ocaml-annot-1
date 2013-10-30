@@ -33,7 +33,7 @@ src:	$(SRC)
 clean:
 	$(OCB) -clean
 	for f in *.nw; do $(LP) roots $$f | xargs rm -f; done
-	rm -f annot
+	rm -f annot main.byte main.native
 
 %.ml:		%.nw
 		$(LP) tangle -f cpp $@ $< >$@
