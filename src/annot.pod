@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-annot -- lookup OCaml annotations
+annot -- lookup OCaml annotations 
 
 =head1 SYNOPSIS
 
@@ -19,12 +19,12 @@ B<annot> B<-version>
 =head1 DESCRIPTION
 
 B<Annot> looks up annotations for identifiers in an OCaml source file.
-Such annotations are produced by ocaml(1) and stored in *.annot files,
-which is either read from standard input, or from I<file.annot>.
-Currently, only the lookup of type annotations is supported. For lookup
-of an annotation, the identifier's source code position as I<line> and
-I<column> is passed to B<annot>. It is typically invoked from an editor
-to lookup the type of an identifier under the cursor.
+Such annotations are produced by ocamlc(1) and stored in an *.annot file,
+which is read by B<annot> either from standard input, or from I<file.annot>.
+For looking up an annotation for an identifier, the identifier's source
+code position as I<line> and I<column> is passed to B<annot>. It is
+typically invoked from an editor to lookup the type of an identifier under
+the cursor.
 
 =head1 OPTIONS
 
@@ -46,9 +46,8 @@ This is sometimes useful when showing the output inside an editor.
 
 =item B<-r>
 
-When emitting an annotation include the source-code range for which the
+When emitting an annotation, include the source code range for which the
 annotation is intended. This could be used to highlight it in an editor.
-
 
 =item B<-h>
 
@@ -60,15 +59,19 @@ Emit the version of B<annot> to stdout and exit with code 0.
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS AND CONTRIBUTORS
 
 Please send feedback, bug reports, and experience reports to the author:
-Christian Lindig <lindig@cs.uni-sb.de>
-L<http://www.st.cs.uni-sb.de/~lindig/>
+
+Christian Lindig <lindig@gmail.com>: original author; refactored the build
+system to use OCamlbuild.
+
+Anil Madhavapeddy <anil@recoil.org>,  http://anil.recoil.org: moved the
+project to GitHub, exposed C<realpath()> through C<custom_unix_stubs.c>. 
 
 =head1 COPYRIGHT
 
-Copyright (c) 2006 Christian Lindig <lindig@cs.uni-sb.de>. All
+Copyright (c) 2006, 2013 Christian Lindig <lindig@gmail.com>. All
 rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -109,11 +112,6 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
-
-
-=head1 VERSION
-
- $Id$
 
 =head1 SEE ALSO 
 
