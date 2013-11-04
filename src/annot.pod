@@ -59,6 +59,21 @@ Emit the version of B<annot> to stdout and exit with code 0.
 
 =back
 
+=head1 FILE LOOKUP
+
+B<Annot> reads from stdin or from the file provided as argument. If
+the file name provided as argument is an absolute file path, it is taken as
+is and B<annot> fails if it doesn't exist. If the file path
+provided is relative, B<annot> searches for it before it fails: B<annot>
+prefixes the relative path in turn with each of the following directory
+names:
+
+    . _build ../_build
+
+For example, if F<src/main.annot> is provided, B<annot> will try
+F<./src/main.annot>, F<_build/src/main.annot> and
+F<../_build/src/main.annot> before it fails should none of these exist.
+
 =head1 AUTHORS AND CONTRIBUTORS
 
 Please send feedback, bug reports, and experience reports to the author:

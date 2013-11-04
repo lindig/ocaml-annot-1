@@ -50,9 +50,15 @@ let help ()    = List.iter print_endline synopsis
 module A = Annot.ByPosition
 @
 
-<<main.ml>>=
-external realpath: string -> string = "unix_realpath"
+I don't know why we need to normalize file paths and we need regular
+expression matching and why we need to find a common prefix when looking
+for the file.
 
+<<unused.ml>>=
+external realpath: string -> string = "unix_realpath"
+(** Normalizes a Unix file path, see realpath(3) *)
+
+<<unused.ml>>=
 let find file =
   let cwd = realpath (Sys.getcwd ()) in
   let filedir = realpath (Filename.dirname file) in
@@ -76,6 +82,55 @@ let find file =
     )
   |_ -> error "Can't find file %s" file
 
+@ We expect that the file containing the annotations for a source code
+position is read from a file whose name is passed on the command line or
+read from stdin. Typically the tool is called from within an editor that
+knows the source file for which annotations should be consulted but it
+might not know where the corresponding annotations file resides. The reason
+is that the connection between a source file and the file containing its
+annotations isn't obvious.
+
+Traditionally, a source file and its compiler-generated annotation file
+lived in the same directory. But build tools like OCamlbuild popularized
+the idea to keep compiler-generated files in a separate directory. We want
+to provide a little support for this situation by helping to locate an
+annotations file.
+
+This tool employs the following heuristic to find a file containing source
+code annotations:
+
+1.  If the file name provided to the tool is an absolute path, the tool
+    expects this file to contain the annotations. It fails, if the file
+    doesn't exist.
+
+2.  If the file name provided to the tool is a relative path, the tool will
+    use it in a search heuristic.  The (relative) file name is prepended
+    with each element from a search path until it finds a file or the
+    search path is exhausted and it fails.
+
+For now, the search path is hard coded here. In the future, we might want
+to read it from an environment variable.
+
+<<main.ml>>=
+let (//)        = Filename.concat 
+let searchpath  = ["."; "_build"; ".." // "_build"]
+
+<<main.ml>>=
+let search file searchpath =
+    assert (Filename.is_relative file);
+    let rec loop = function
+        | []    -> error "Can't find file %s" file
+        | p::ps -> let path = p // file in
+                       if Sys.file_exists path then path else loop ps
+    in
+        loop searchpath
+
+let find (file: string) = 
+    if Filename.is_relative file then search file searchpath
+    else if Sys.file_exists file then file (* absolute file path *)
+    else error "Can't find file %s" file
+@
+
 @ Operation [[with_file]] opens a file for reading and passes the file
 handle to an action. It takes care of closing the file, even in the case
 of errors.
@@ -83,12 +138,9 @@ of errors.
 <<main.ml>>=
 let with_file file action =
     let ic = open_in file in
-    try 
-        let result = action ic in
+    let result = try action ic with exn -> close_in ic; raise exn in  
         close_in ic; result
-    with
-        x -> close_in ic; raise x
-
+        
 let annotations_from channel = 
     let lexbuf = Lexing.from_channel channel in
     try
@@ -97,18 +149,17 @@ let annotations_from channel =
         Parsing.Parse_error -> 
             error "parse error at offset %d" (Lexing.lexeme_start lexbuf)
 
-let int x   = try int_of_string x with Failure _ -> error "not an int: %s" x
 @
 
 Options that control the format when emitting annotations.
 
 <<main.ml>>=
 type options =
-    { mutable newline:  bool   (* emit newline after annotation *)
-    ; mutable range:    bool     (* include range in type annotation *)
+    { mutable newline:  bool    (* emit newline after annotation *)
+    ; mutable range:    bool    (* include range in type annotation *)
     }
     
-let options = 
+let options: options = (* with defaults *)
     { newline   =   true
     ; range     =   false
     }
@@ -119,6 +170,10 @@ given [[line]] and [[column]] to stdout. We first build an interval map
 and then search it for the given position.
 
 <<main.ml>>=
+let int: string -> int = 
+    (** Convert string to integer of fail *)
+    fun x -> try int_of_string x with Failure _ -> error "not an int: %s" x
+
 let typeannot options line column ic = 
     let line, column = int line, int column in
     let nl           = if options.newline then "\n" else "" in
@@ -148,7 +203,7 @@ let main () =
         | ["-type"; line;col;file] -> with_file (find file) 
                                         @@ typeannot options line col 
         | ["-type"; line;col]      -> typeannot options line col stdin
-        | ["-dump"; file]          -> with_file file @@ dump
+        | ["-dump"; file]          -> with_file (find file) dump
         | ["-dump"]                -> dump stdin
         | x :: _ -> usage "error: illegal command line argument %s" x
         | []     -> usage "error: expected an option"

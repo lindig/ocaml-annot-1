@@ -1,5 +1,5 @@
 
 <*.ml>:     annot
-<*.byte>:   linkdep(custom_unix_stubs.o),custom
-<*.native>: linkdep(custom_unix_stubs.o)
+# <*.byte>:   linkdep(custom_unix_stubs.o),custom
+# <*.native>: linkdep(custom_unix_stubs.o)
 

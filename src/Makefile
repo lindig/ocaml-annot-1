@@ -1,9 +1,10 @@
 # vim:ts=8 sw=4 noet:
 #
 
-.PHONY: all byte src clean
+.PHONY: all byte src clean man
 
 TOP =	..
+
 
 SRC =	annot.ml	\
 	annot.mli	\
@@ -20,13 +21,14 @@ SRC =	annot.ml	\
 
 OCB =	ocamlbuild
 LP =	$(TOP)/lipsum/lipsum
+P2M =	pod2man
 
-all:	$(SRC)
-	$(OCB) -libs str main.native 
+all:	$(SRC) annot.1
+	$(OCB) main.native 
 	cp main.native annot
 
 byte:   $(SRC)
-	$(OCB) -libs str main.byte
+	$(OCB) main.byte
 
 src:	$(SRC)
 
@@ -34,6 +36,7 @@ clean:
 	$(OCB) -clean
 	for f in *.nw; do $(LP) roots $$f | xargs rm -f; done
 	rm -f annot main.byte main.native
+	rm -f annot.1
 
 %.ml:		%.nw
 		$(LP) tangle -f cpp $@ $< >$@
@@ -50,3 +53,5 @@ scanner.mli:	syntax.nw
 parser.mly:	syntax.nw
 		$(LP) tangle -f cpp $@ $< >$@
 
+%.1:		%.pod
+		$(P2M) $< > $@
