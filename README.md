@@ -55,8 +55,30 @@ Instructions for other editors can be found in the editors/ directory.
 ## SOURCE CODE
 
 The source code is a literate program for the NoWeb literate programming
-tools and resides in the *.nw file in directory src/. However, you don't
-need NoWeb to compile and install the Annot.  
+tools and resides in the `*.nw` file in directory src/. However, you don't
+need NoWeb to compile and install the Annot.  The source code includes
+Lisum, a tool to unpack the source code from the literate program.
+
+## DIRECTORIES
+
+    src/        source code for annot
+    lipsum/     source code for literate programming tool
+    editors/    code for editors to invoke annot
+
+
+## GIT
+
+The lipsum/ directory is a 
+[Git
+subtree](https://blogs.atlassian.com/2013/05/alternatives-to-git-submodule-git-subtree/).
+The advantage over a submodule is that it doesn't require initialization
+and doesn't rely on the availability of a remote Git repository. Hence, the
+code becomes more self contained.
+
+To update the subtree, use:
+
+    git subtree pull --prefix lipsum lipsum master
+
 
 ## COPYRIGHT
 
