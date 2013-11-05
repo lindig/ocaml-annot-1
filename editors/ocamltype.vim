@@ -8,6 +8,6 @@ function! OCamlType()
     let file = expand("%:p:r")
     echo system("annot -n -type " . line . " " . col . " " . file . ".annot")
 endfunction    
-map ,t :call OCamlType()<return>
+map <leader>t :call OCamlType()<return>
 
 
