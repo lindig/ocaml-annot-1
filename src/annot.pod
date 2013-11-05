@@ -1,10 +1,10 @@
 #
-#
+# This file is in Perl POD syntax.
 #
 
 =head1 NAME
 
-annot -- lookup OCaml annotations 
+annot -- lookup compiler-generated annotations in OCaml source code
 
 =head1 SYNOPSIS
 
@@ -19,12 +19,12 @@ B<annot> B<-version>
 =head1 DESCRIPTION
 
 B<Annot> looks up annotations for identifiers in an OCaml source file.
-Such annotations are produced by ocamlc(1) and stored in an *.annot file,
-which is read by B<annot> either from standard input, or from I<file.annot>.
-For looking up an annotation for an identifier, the identifier's source
-code position as I<line> and I<column> is passed to B<annot>. It is
-typically invoked from an editor to lookup the type of an identifier under
-the cursor.
+Such annotations are produced by the OCaml compiler ocamlc(1) and stored in
+an *.annot file, which is read by B<annot> either from standard input, or
+from I<file.annot>.  For looking up the annotation for an identifier, the
+identifier's source code position as I<line> and I<column> is passed to
+B<annot>. It is typically invoked from an editor to lookup the type of an
+identifier under the cursor.
 
 =head1 OPTIONS
 
@@ -37,7 +37,7 @@ it to standard output.
 
 =item B<-dump>
 
-Dump the annotations read to stdout. This is mostly used for debugging.
+Dump all annotations to stdout. This is mostly used for debugging.
 
 =item B<-n>
 
@@ -51,7 +51,7 @@ annotation is intended. This could be used to highlight it in an editor.
 
 =item B<-h>
 
-Emit short help message to stdout and exit with code 0.
+Emit short a help message to stdout and exit with code 0.
 
 =item B<-version>
 
@@ -62,16 +62,17 @@ Emit the version of B<annot> to stdout and exit with code 0.
 =head1 FILE LOOKUP
 
 B<Annot> reads from stdin or from the file provided as argument. If
-the file name provided as argument is an absolute file path, it is taken as
-is and B<annot> fails if it doesn't exist. If the file path
-provided is relative, B<annot> searches for it before it fails: B<annot>
-prefixes the relative path in turn with each of the following directory
-names:
+the file name provided as argument is an I<absolute> file path, it is taken
+as is and B<annot> fails if it doesn't exist. If the file path provided is
+I<relative>, B<annot> searches for it before it fails: B<annot> prefixes
+the relative path in turn with each of the following directory names:
 
-    . _build ../_build
+    . 
+    _build 
+    ../_build
 
-For example, if F<src/main.annot> is provided, B<annot> will try
-F<./src/main.annot>, F<_build/src/main.annot> and
+For example, if F<src/main.annot> is provided as an argument, B<annot> will
+try F<./src/main.annot>, F<_build/src/main.annot> and
 F<../_build/src/main.annot> before it fails should none of these exist.
 
 =head1 AUTHORS AND CONTRIBUTORS
