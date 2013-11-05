@@ -113,7 +113,17 @@ to read it from an environment variable.
 
 <<main.ml>>=
 let (//)        = Filename.concat 
-let searchpath  = ["."; "_build"; ".." // "_build"]
+let searchpath  = 
+    [ "."
+    ; "_build"
+    ; ".." // "_build"
+      (* Those below should not be in here as they are too specific.
+         Keeping them for backward compatibility for now *)
+    ; "_build" // "unix-socket"
+    ; "_build" // "unix-direct"
+    ; "_build" // "node"
+    ; "_build" // "xen" 
+    ]
 
 <<main.ml>>=
 let search file searchpath =
