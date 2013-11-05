@@ -10,7 +10,8 @@ all:	lipsum
 	$(MAKE) -C src $@
 
 clean:
-	$(MAKE) -C src $@
+	$(MAKE) -C src    $@
+	$(MAKE) -C lipsum $@
 
 install: all
 
