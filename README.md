@@ -1,5 +1,5 @@
 
-# ANNOT 1.0.0
+# ANNOT 
 
 This is the source code for Annot, a tool to lookup annotations for
 Objective Caml source code. The main purpose is to lookup the type
@@ -29,10 +29,11 @@ principle other annotations could be looked up as well.
 Annot is implemented in Objective Caml. To compile it from source code,
 try the following:
 
+    # customize variable PREFIX in Makefile
     make
-    make install
+    make install    # install executable and manual page
 
-The latest tested version is OCaml 4.00.
+The latest tested version is OCaml 4.00.1.
 
 ## USING ANNOT FROM AN EDITOR
 
@@ -57,7 +58,7 @@ Instructions for other editors can be found in the editors/ directory.
 The source code is a literate program for the NoWeb literate programming
 tools and resides in the `*.nw` file in directory src/. However, you don't
 need NoWeb to compile and install the Annot.  The source code includes
-Lisum, a tool to unpack the source code from the literate program.
+Lipsum, a tool to unpack the source code from the literate program.
 
 ## DIRECTORIES
 

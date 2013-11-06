@@ -72,8 +72,13 @@ the relative path in turn with each of the following directory names:
     ../_build
 
 For example, if F<src/main.annot> is provided as an argument, B<annot> will
-try F<./src/main.annot>, F<_build/src/main.annot> and
-F<../_build/src/main.annot> before it fails should none of these exist.
+try in order to read these files:
+
+    ./src/main.annot 
+    _build/src/main.annot
+    ../_build/src/main.annot 
+
+B<Annot> will fail, if none of these exist.
 
 =head1 AUTHORS AND CONTRIBUTORS
 
