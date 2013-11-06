@@ -1,0 +1,9 @@
+src/*.mli
+src/*.ml
+src/*.mly
+src/*.mll
+src/_build
+src/*.native
+src/*.byte
+src/*.1
+src/annot
