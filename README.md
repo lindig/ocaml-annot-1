@@ -43,7 +43,7 @@ file (also provided in editors/):
     function! OCamlType()
         let col  = col('.')
         let line = line('.')
-        let file = expand("%:p:r")
+        let file = expand("%:r")
         echo system("annot -n -type ".line." ".col." ".file.".annot")
     endfunction    
     map <leader>t :call OCamlType()<return>
