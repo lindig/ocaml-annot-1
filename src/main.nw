@@ -127,13 +127,13 @@ let searchpath  =
 
 <<main.ml>>=
 let search file searchpath =
+    (** return path to file that has been found utilizing a searchpath *)
     assert (Filename.is_relative file);
-    let rec loop = function
-        | []    -> error "Can't find file %s" file
-        | p::ps -> let path = p // file in
-                       if Sys.file_exists path then path else loop ps
-    in
-        loop searchpath
+    let exists path = Sys.file_exists (path // file) in 
+    try 
+        List.find exists searchpath // file
+    with 
+        Not_found -> error "Can't find file %s" file
 
 let find (file: string) = 
     if Filename.is_relative file then search file searchpath
