@@ -1,4 +1,4 @@
-# vim:ts=8 sw=4 noet:
+# vim:ts=8:sw=4:noet
 #
 
 .PHONY: all byte src clean man
@@ -21,7 +21,7 @@ SRC =	annot.ml	\
 
 OCB =	ocamlbuild
 LP =	$(TOP)/lipsum/lipsum
-P2M =	pod2man
+P2M =	pod2man --center "Tools for OCaml" --date "$$(date)"
 
 all:	$(SRC) annot.1
 	$(OCB) main.native 
