@@ -32,6 +32,8 @@ try the following:
     # customize variable PREFIX in Makefile
     make
     make install    # install executable and manual page
+    # or
+    make PREFIX=/usr/local install
 
 The latest tested version is OCaml 4.00.1.
 
