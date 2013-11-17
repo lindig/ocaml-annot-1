@@ -125,6 +125,9 @@ let searchpath  =
     ; "_build" // "xen" 
     ]
 
+let searchpath_str = String.concat ":" searchpath
+
+
 <<main.ml>>=
 let search file searchpath =
     (** return path to file that has been found utilizing a searchpath *)
@@ -133,12 +136,12 @@ let search file searchpath =
     try 
         List.find exists searchpath // file
     with 
-        Not_found -> error "Can't find file %s" file
+        Not_found -> error "Can't find file %s in %s" file searchpath_str
 
 let find (file: string) = 
     if Filename.is_relative file then search file searchpath
     else if Sys.file_exists file then file (* absolute file path *)
-    else error "Can't find file %s" file
+    else error "Can't find file %s in" file searchpath_str
 @
 
 @ Operation [[with_file]] opens a file for reading and passes the file
